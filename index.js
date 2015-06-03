@@ -70,18 +70,18 @@ function scheme(conf, options) {
 
       Object.keys(flat_conf_request).forEach(function (key) {
         if (flat_ctx_request[key] === undefined) {
-          debug('%s %s <- %s', ctx.method, ctx.path, key + ' : Not exist!');
-          if (options.debug) ctx.throw(400, key + ' : Not exist!');
+          debug('%s %s <- %s', ctx.method, ctx.path, key + ' : not exist!');
+          ctx.throw(400, 'The parameter ' + key + ' not exist');
         }
         if ('function' === typeof flat_conf_request[key]) {
           if(!flat_conf_request[key].call(ctx, flat_ctx_request[key])) {
             debug('%s %s <- %s : %s ✖ [Function: %s]', ctx.method, ctx.path, key, flat_ctx_request[key], (flat_conf_request[key].name || 'function'));
-            if (options.debug) ctx.throw(400, key + ' : ' + flat_ctx_request[key] + ' ✖ [Function: ' + (flat_conf_request[key].name || 'function') + ']');
+            ctx.throw(400, 'The parameter ' + key + ' : ' + flat_ctx_request[key] + ' is invalid']');
           }
         } else {
           if (!RegExp(flat_conf_request[key]).test(flat_ctx_request[key])) {
             debug('%s %s <- %s : %s ✖ %s', ctx.method, ctx.path, key, flat_ctx_request[key], flat_conf_request[key]);
-            if (options.debug) ctx.throw(400, key + ' : ' + flat_ctx_request[key] + ' ✖ ' + flat_conf_request[key]);
+            ctx.throw(400, 'The parameter ' + key + ' : ' + flat_ctx_request[key] + ' is invalid']');
           }
         }
       });
@@ -98,17 +98,17 @@ function scheme(conf, options) {
         Object.keys(flat_conf_response).forEach(function (key) {
           if (flat_ctx_response[key] === undefined) {
             debug('%s %s -> %s', ctx.method, ctx.path, key + ' : Not exist!');
-            if (options.debug) ctx.throw(500, key + ' : Not exist!');
+            ctx.throw(500, 'The parameter ' + key + ' not exist');
           }
           if ('function' === typeof flat_conf_response[key]) {
             if(!flat_conf_response[key].call(ctx, flat_ctx_response[key])) {
               debug('%s %s -> %s : %s ✖ [Function: %s]', ctx.method, ctx.path, key, flat_ctx_response[key], (flat_conf_response[key].name || 'function'));
-              if (options.debug) ctx.throw(500, key + ' : ' + flat_ctx_response[key] + ' ✖ [Function: ' + (flat_conf_response[key].name || 'function') + ']');
+              ctx.throw(500, 'The parameter ' + key + ' : ' + flat_ctx_response[key] + ' is invalid);
             }
           } else {
             if (!RegExp(flat_conf_response[key]).test(flat_ctx_response[key])) {
               debug('%s %s -> %s : %s ✖ %s', ctx.method, ctx.path, key, flat_ctx_response[key], flat_conf_response[key]);
-              if (options.debug) ctx.throw(500, key + ' : ' + flat_ctx_response[key] + ' ✖ ' + flat_conf_response[key]);
+              ctx.throw(500, 'The parameter ' + key + ' : ' + flat_ctx_response[key] + ' is invalid);
             }
           }
         });
@@ -118,7 +118,7 @@ function scheme(conf, options) {
 }
 
 /**
- * Only return readable attributes in 
+ * Only return readable attributes in
  * ctx.request and ctx.response.
  *
  * @param {Object}
@@ -128,9 +128,9 @@ function scheme(conf, options) {
 
 function filterFunc(ctx) {
   var _ctx = {};
-  ["header", "headers", "method", "url", "originalUrl", "path", "query", 
+  ["header", "headers", "method", "url", "originalUrl", "path", "query",
   "querystring", "host", "hostname", "fresh", "stale",
-  "protocol", "secure", "ip", "ips", "subdomains", 
+  "protocol", "secure", "ip", "ips", "subdomains",
   "body", "status", "message", "length", "type", "headerSent"].forEach(function (item) {
     if (ctx[item]) _ctx[item] = ctx[item];
   });
